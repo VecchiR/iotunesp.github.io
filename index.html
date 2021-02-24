@@ -1,0 +1,78 @@
+<!DOCTYPE HTML><html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"/>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    h3 {
+      font-family: Arial;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Trabalho de Graduação - UNESP 2021</h2>
+  <h3>Rafael Vecchi Silva (141012201)</h3>
+  <br><br><br>
+  <div id="chart-current" class="container"></div>
+</body>
+
+<script>
+var chartT = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-current' },
+  title: { text: 'Monitoramento de Corrente via NodeMCU + ACS712' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: true,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#6de8bd' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title:{"text":"Corrente (A)"},
+    //ceiling:5,
+    minRange:1,
+    floor:0
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      if(chartT.series[0].data.length > 40) {
+        chartT.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartT.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/current", true);
+  xhttp.send();
+}, 1500 ) ;
+
+
+</script>
+</html>
